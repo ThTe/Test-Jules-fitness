@@ -1,0 +1,48 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.cxx/
+.gradletasknamecache
+.idea
+.packages
+.project
+.vscode/
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+dist/
+
+# Platform-specific build artifacts
+/ios/Pods/
+/ios/Flutter/App.framework
+/ios/Flutter/engine.framework
+/ios/Flutter/flutter_assets/
+/ios/Flutter/.last_build_id
+/ios/.symlinks/
+/ios/Runner/GeneratedPluginRegistrant.*
+/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+/android/.gradle
+/android/app/build/
+/android/build/
+
+# IDE files
+*.iml
+*.metadata
+
+# Secrets
+key.properties
+local.properties
+/android/key.properties
+/android/local.properties
+/ios/key.properties
+/ios/local.properties
