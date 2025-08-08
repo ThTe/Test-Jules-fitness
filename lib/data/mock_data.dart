@@ -1,3 +1,4 @@
+import 'package:mobility_check_progress/models/exercise.dart';
 import 'package:mobility_check_progress/models/mobility_test.dart';
 
 final List<MobilityTest> mockTests = [
@@ -30,5 +31,43 @@ final List<MobilityTest> mockTests = [
     name: 'Extension lombaire debout',
     description: 'Vérifie la capacité d\'extension de la colonne lombaire.',
     category: 'Dos',
+  ),
+];
+
+final List<Exercise> mockExercises = [
+  Exercise(
+    id: 'e1',
+    name: '90/90 Hip Rotation',
+    description: 'Améliore la rotation interne et externe de la hanche.',
+    targetArea: 'Hanches',
+    difficulty: ExerciseDifficulty.intermediaire,
+  ),
+  Exercise(
+    id: 'e2',
+    name: 'Kneeling Psoas Stretch',
+    description: 'Étire le psoas et les fléchisseurs de la hanche.',
+    targetArea: 'Hanches',
+    difficulty: ExerciseDifficulty.debutant,
+  ),
+  Exercise(
+    id: 'e3',
+    name: 'Ankle Dorsiflexion Against Wall',
+    description: 'Mobilise l\'articulation de la cheville en flexion dorsale.',
+    targetArea: 'Chevilles',
+    difficulty: ExerciseDifficulty.debutant,
+  ),
+  Exercise(
+    id: 'e4',
+    name: 'Cat-Cow Stretch',
+    description: 'Améliore la flexion et l\'extension de la colonne vertébrale.',
+    targetArea: 'Dos',
+    difficulty: ExerciseDifficulty.debutant,
+  ),
+  Exercise(
+    id: 'e5',
+    name: 'Assisted Deep Squat Hold',
+    description: 'Aide à développer le confort et la profondeur dans la position de squat.',
+    targetArea: 'Chaîne inférieure',
+    difficulty: ExerciseDifficulty.intermediaire,
   ),
 ];

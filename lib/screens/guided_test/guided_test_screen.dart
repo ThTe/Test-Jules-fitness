@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobility_check_progress/models/mobility_test.dart';
+import 'package:mobility_check_progress/providers/test_provider.dart';
+import 'package:provider/provider.dart';
 
 class GuidedTestScreen extends StatefulWidget {
   final MobilityTest test;
@@ -66,11 +68,13 @@ class _GuidedTestScreenState extends State<GuidedTestScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _selectedScore == null ? null : () {
-                  // TODO: Save the result using the TestResult model
-                  print('Test: ${widget.test.name}, Score: $_selectedScore');
-                  Navigator.of(context).pop(); // Go back to the list
-                },
+                onPressed: _selectedScore == null
+                    ? null
+                    : () {
+                        Provider.of<TestProvider>(context, listen: false)
+                            .addResult(widget.test, _selectedScore!);
+                        Navigator.of(context).pop(); // Go back to the list
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
                   foregroundColor: Colors.white,

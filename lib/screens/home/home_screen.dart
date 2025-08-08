@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobility_check_progress/providers/test_provider.dart';
+import 'package:mobility_check_progress/screens/diagnosis/diagnosis_screen.dart';
 import 'package:mobility_check_progress/screens/test_list/test_list_screen.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -14,7 +17,7 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildScoreCard(),
+          _buildScoreCard(context),
           const SizedBox(height: 24),
           _buildQuickActions(context),
           const SizedBox(height: 24),
@@ -24,32 +27,47 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScoreCard() {
+  Widget _buildScoreCard(BuildContext context) {
     return Card(
       elevation: 4.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'Score Global de Mobilité',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-            ),
-            SizedBox(height: 10),
-            Center(
-              child: Text(
-                '85/100', // Placeholder score
-                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.teal),
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Basé sur votre dernière évaluation.', // Placeholder text
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
+        child: Consumer<TestProvider>(
+          builder: (context, testProvider, child) {
+            final score = testProvider.globalScore;
+            final resultsCount = testProvider.results.length;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Score Global de Mobilité',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
+                ),
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    '$score/100',
+                    style: const TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.teal),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  resultsCount == 0
+                      ? 'Complétez un test pour voir votre score.'
+                      : 'Basé sur vos $resultsCount derniers résultats.',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -79,7 +97,12 @@ class HomeScreen extends StatelessWidget {
         OutlinedButton.icon(
           icon: const Icon(Icons.bar_chart),
           label: const Text('Voir mon diagnostic'),
-          onPressed: () { /* TODO: Navigate to diagnosis */ },
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DiagnosisScreen()),
+            );
+          },
           style: OutlinedButton.styleFrom(
              foregroundColor: Colors.teal,
              side: const BorderSide(color: Colors.teal),

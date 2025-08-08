@@ -1,0 +1,6 @@
+# Configuration file for Replit
+# Specifies the command to run the Flutter web application
+
+run = "flutter run -d chrome --web-hostname 0.0.0.0 --web-port 8080"
+language = "flutter"
+entrypoint = "lib/main.dart"
