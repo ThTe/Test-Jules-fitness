@@ -8,7 +8,6 @@ import 'package:mobility_check_progress/models/test_result.dart';
 class TestProvider with ChangeNotifier {
   final List<TestResult> _results = [];
 
-  // Expose an unmodifiable view of the results list
   UnmodifiableListView<TestResult> get results => UnmodifiableListView(_results);
 
   Map<String, TestResult> get _latestResults {
@@ -24,25 +23,16 @@ class TestProvider with ChangeNotifier {
 
   int get globalScore {
     if (mockTests.isEmpty) return 0;
+    final latest = _latestResults;
+    if (latest.isEmpty) return 0;
 
-    final latestResults = _latestResults;
-
-    if (latestResults.isEmpty) return 0;
-
-    // Sum the scores of the latest results.
-    final totalAchievedScore =
-        latestResults.values.fold<int>(0, (sum, current) => sum + current.score);
-
-    // The maximum possible score is based on ALL available tests.
-    final maxPossibleScore =
-        mockTests.length * 2; // Max score is 2 for each test.
+    final totalAchievedScore = latest.values.fold<int>(0, (sum, current) => sum + current.score);
+    final maxPossibleScore = mockTests.length * 2;
 
     if (maxPossibleScore == 0) return 0;
-
     return ((totalAchievedScore / maxPossibleScore) * 100).round();
   }
 
-  /// Returns a list of tests where the latest score is less than 2.
   List<MobilityTest> get weaknesses {
     final latest = _latestResults;
     final weakTestIds = latest.entries
@@ -51,33 +41,42 @@ class TestProvider with ChangeNotifier {
         .toSet();
 
     if (weakTestIds.isEmpty) return [];
-
     return mockTests.where((test) => weakTestIds.contains(test.id)).toList();
   }
 
-  /// Returns a list of exercises recommended based on the weaknesses.
   List<Exercise> get recommendedExercises {
     final weakCategories = weaknesses.map((test) => test.category).toSet();
-
     if (weakCategories.isEmpty) return [];
-
-    return mockExercises
-        .where((exercise) => weakCategories.contains(exercise.targetArea))
-        .toList();
+    return mockExercises.where((exercise) => weakCategories.contains(exercise.targetArea)).toList();
   }
 
-  void addResult(MobilityTest test, int score) {
+  /// A simple temporary scoring logic.
+  /// If any response is 'true' (indicating a fault), score is 1. Otherwise, score is 2.
+  int _calculateScoreFromResponses(Map<String, dynamic> responses) {
+    // If there are no responses, we can't calculate a score. This shouldn't happen
+    // if the UI enables the button correctly, but as a safeguard:
+    if (responses.isEmpty) return 1;
+
+    bool anyFault = responses.values.any((response) => response == true);
+    return anyFault ? 1 : 2;
+  }
+
+  void addResult(MobilityTest test, {Map<String, dynamic>? responses, int? score}) {
+    // Ensure that either responses or a score is provided, but not both.
+    assert((responses != null && score == null) || (responses == null && score != null));
+
+    final int finalScore = score ?? _calculateScoreFromResponses(responses!);
+
     final newResult = TestResult(
-      // Using a timestamp for a unique ID for now
       id: DateTime.now().toIso8601String(),
       testId: test.id,
-      score: score,
       date: DateTime.now(),
+      // Use provided responses or an empty map if score was given directly
+      responses: responses ?? {},
+      score: finalScore,
     );
 
     _results.add(newResult);
-
-    // Notify all listening widgets that the data has changed.
     notifyListeners();
   }
 }
