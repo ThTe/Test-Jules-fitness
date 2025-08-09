@@ -8,7 +8,7 @@ class Exercise {
   final ExerciseDifficulty difficulty;
   final String? videoOrImageUrl; // Optional visual guide
 
-  Exercise({
+  const Exercise({
     required this.id,
     required this.name,
     required this.description,
