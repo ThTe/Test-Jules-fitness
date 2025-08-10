@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobility_check_progress/providers/test_provider.dart';
 import 'package:mobility_check_progress/screens/diagnosis/diagnosis_screen.dart';
 import 'package:mobility_check_progress/screens/test_list/test_list_screen.dart';
+import 'package:mobility_check_progress/widgets/common/section_title.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,7 +13,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tableau de Bord'),
-        backgroundColor: Colors.teal,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -29,8 +29,6 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildScoreCard(BuildContext context) {
     return Card(
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Consumer<TestProvider>(
@@ -41,21 +39,25 @@ class HomeScreen extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Score Global de Mobilité',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 10),
                 Center(
-                  child: Text(
-                    '$score/100',
-                    style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                    child: Text(
+                      '$score/100',
+                      // The key is crucial for AnimatedSwitcher to know the widget has changed.
+                      key: ValueKey<int>(score),
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -63,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                   resultsCount == 0
                       ? 'Complétez un test pour voir votre score.'
                       : 'Basé sur vos $resultsCount derniers résultats.',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             );
@@ -86,12 +88,6 @@ class HomeScreen extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const TestListScreen()),
             );
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
         ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
@@ -103,10 +99,6 @@ class HomeScreen extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const DiagnosisScreen()),
             );
           },
-          style: OutlinedButton.styleFrom(
-             foregroundColor: Colors.teal,
-             side: const BorderSide(color: Colors.teal),
-          ),
         ),
       ],
     );
@@ -116,10 +108,7 @@ class HomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Progression',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-        ),
+        const SectionTitle(title: 'Progression'),
         const SizedBox(height: 10),
         Container(
           height: 150,

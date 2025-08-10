@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobility_check_progress/models/exercise.dart';
 import 'package:mobility_check_progress/models/mobility_test.dart';
 import 'package:mobility_check_progress/providers/test_provider.dart';
+import 'package:mobility_check_progress/screens/exercise/exercise_screen.dart';
+import 'package:mobility_check_progress/widgets/common/section_title.dart';
 import 'package:provider/provider.dart';
 
 class DiagnosisScreen extends StatelessWidget {
@@ -12,7 +14,6 @@ class DiagnosisScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mon Diagnostic'),
-        backgroundColor: Colors.teal,
       ),
       body: Consumer<TestProvider>(
         builder: (context, testProvider, child) {
@@ -26,11 +27,11 @@ class DiagnosisScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
-              _buildSectionTitle(context, 'Mes points à améliorer'),
+              const SectionTitle(title: 'Mes points à améliorer'),
               ...weaknesses.map((test) => _buildWeaknessTile(test)),
               const SizedBox(height: 24),
-              _buildSectionTitle(context, 'Exercices recommandés'),
-              ...exercises.map((exercise) => _buildExerciseTile(exercise)),
+              const SectionTitle(title: 'Exercices recommandés'),
+              ...exercises.map((exercise) => _buildExerciseTile(context, exercise)),
             ],
           );
         },
@@ -64,15 +65,6 @@ class DiagnosisScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
 
   Widget _buildWeaknessTile(MobilityTest test) {
     return Card(
@@ -85,13 +77,22 @@ class DiagnosisScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExerciseTile(Exercise exercise) {
+  Widget _buildExerciseTile(BuildContext context, Exercise exercise) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: const Icon(Icons.fitness_center, color: Colors.teal),
         title: Text(exercise.name),
         subtitle: Text(exercise.targetArea),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExerciseScreen(exercise: exercise),
+            ),
+          );
+        },
       ),
     );
   }
