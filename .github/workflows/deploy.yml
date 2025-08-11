@@ -1,17 +1,32 @@
+# Nom du flux de travail
 name: Deploy Flutter Web to GitHub Pages
 
 on:
+  # Déclenche l'action sur les push vers la branche `main`
   push:
-    branches:
-      - main # Déclenche l'action uniquement sur les push vers la branche main
+    branches: ["main"]
+
+  # Permet de lancer ce flux de travail manuellement depuis l'onglet Actions
+  workflow_dispatch:
+
+# Définit les permissions du GITHUB_TOKEN pour autoriser le déploiement sur GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Autorise un seul déploiement concurrent
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  build_and_deploy:
+  # Tâche de compilation (build)
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -21,14 +36,24 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build web app
-        # Construit l'application avec le bon chemin de base pour GitHub Pages
-        # ${{ github.event.repository.name }} est une variable qui sera automatiquement remplacée par le nom de votre dépôt
+      - name: Build web
         run: flutter build web --release --base-href /${{ github.event.repository.name }}/
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Le répertoire à publier (la sortie de la commande de build)
-          publish_dir: ./build/web
+          # Le chemin vers le dossier contenant les fichiers du site web
+          path: ./build/web
+
+  # Tâche de déploiement
+  deploy:
+    # Dépend de la réussite de la tâche de 'build'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
